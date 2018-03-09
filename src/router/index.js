@@ -244,6 +244,47 @@ export const asyncRouterMap = [
     component: Layout,
     children: [{ path: 'index', component: _import('i18n-demo/index'), name: 'i18n', meta: { title: 'i18n', icon: 'international' }}]
   },
-
+  {
+    path: '/parameter-setting',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'parameter',
+    meta: {
+      title: 'PatameterSetting',
+      icon: 'component'
+    },
+    children: [
+      {
+        path: 'filenum-setting',
+        component: _import('parameter-setting/fileNumSetting'),
+        name: 'FileNumsetting',
+        meta: { title: 'FileNumSetting' }
+      },
+      {
+        path: 'archivalFiling',
+        component: _import('parameter-setting/archivalFiling'),
+        name: 'archivalfiling',
+        meta: {
+          title: 'ArchivalFiling'
+        }
+      },
+      {
+        path: 'filesavesetting',
+        component: _import('parameter-setting/fileSaveSetting'),
+        name: 'fileSaveSetting',
+        meta: {
+          title: 'FileSaveSetting'
+        }
+      },
+      {
+        path: 'serialnumsetting',
+        component: _import('parameter-setting/serialNumSetting'),
+        name: 'serialNumSetting',
+        meta: {
+          title: 'SerialNumSetting'
+        }
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
