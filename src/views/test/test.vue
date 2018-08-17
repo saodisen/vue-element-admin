@@ -1,18 +1,25 @@
 <template>
   <div>
-    <h2>请插入或拨出加密锁。</h2>
+    <h2>请插入或拨出加密锁。{{isin}}</h2>
+    <h3>{{devicePath}}</h3>
+    <el-button @click="findPort" type="primary">查找锁</el-button>
+    <el-button @click="getId" type="primary">查找锁id</el-button>
   </div>
 </template>
 <script>
-import SoftKey3Wsss from '@/usbkey/syunew3'
+import { getUKeyPort, getChipID, ResetOrder, getUkeyObj } from '@/assets/usbkey/utils'
+import SoftKey3Wsss from '@/assets/usbkey/Syunew3'
 export default {
-  created() {
-    var temp = this.isKeyIn()
-    console.log(temp)
-  },
+  // created() {
+  //   this.isKeyIn()
+  //   console.log(this.isKeyIn())
+  //   console.log('created------')
+  //   console.log(this.iskeyIn)
+  // },
   data() {
     return {
-      isIn: false,
+      isin: undefined,
+      devicePath: undefined,
       bConnect: 0
     }
   },
@@ -34,28 +41,59 @@ export default {
         console.log(s_pnp.Socket_UK)
         console.log(s_pnp.u)
         console.log('--------------')
-        s_pnp.Socket_UK.onopen = function() {
+        s_pnp.Socket_UK.onopen = () => {
           this.bConnect = 1 // 代表已经连接，用于判断是否安装了客户端服务
         }
 
         s_pnp.Socket_UK.onmessage = function got_packet(Msg) {
           var PnpData = JSON.parse(Msg.data)
-          console.log("-----------------")
+          console.log('-----------------')
           console.log(PnpData)
           if (PnpData.type === 'PnpEvent') {
             // 如果是插拨事件处理消息
             if (PnpData.IsIn) {
               alert('UKEY已被插入，被插入的锁的路径是：' + PnpData.DevicePath)
+              this.isin = 1
+              console.log(this.isin)
             } else {
               alert('UKEY已被拨出，被拨出的锁的路径是：' + PnpData.DevicePath)
+              this.isin = 0
             }
           }
         }
 
-        s_pnp.Socket_UK.onclose = function() {}
+        s_pnp.Socket_UK.onclose = () => { }
       } catch (e) {
         alert(e.name + ': ' + e.message)
         return false
+      }
+    },
+    findPort() {
+      console.log('findPort')
+      getUKeyPort(0)
+      const s = getUkeyObj()
+      s.onmessage = (result) => {
+        console.log(result)
+        const obj = JSON.parse(result.data)
+        console.log(result)
+        this.devicePath = obj.return_value
+        console.log(this.devicePath)
+      }
+      s.onclose = () => { }
+      console.log(s)
+    },
+    getId() {
+      console.log()
+      getChipID(this.devicePath)
+      const s = getUkeyObj()
+      s.onopen = () => {
+        ResetOrder()
+      }
+      s.onmessage = (result) => {
+        const data = result.data
+        console.log(result)
+        console.log(data)
+        // ResetOrder()
       }
     }
   }
